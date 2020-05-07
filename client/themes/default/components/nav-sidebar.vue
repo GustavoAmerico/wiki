@@ -1,12 +1,12 @@
 <template lang="pug">
   div
-    .blue.darken-3.pa-3.d-flex(v-if='navMode === `MIXED`')
-      v-btn(depressed, color='blue darken-2', style='min-width:0;', @click='goHome')
+    .pa-3.d-flex(v-if='navMode === `MIXED`', :class='$vuetify.theme.dark ? `grey darken-5` : `blue darken-3`')
+      v-btn(depressed, :color='$vuetify.theme.dark ? `grey darken-4` : `blue darken-2`', style='min-width:0;', @click='goHome')
         v-icon(size='20') mdi-home
-      v-btn.ml-3(v-if='currentMode === `custom`', depressed, color='blue darken-2', style='flex: 1 1 100%;', @click='switchMode(`browse`)')
+      v-btn.ml-3(v-if='currentMode === `custom`', depressed, :color='$vuetify.theme.dark ? `grey darken-4` : `blue darken-2`', style='flex: 1 1 100%;', @click='switchMode(`browse`)')
         v-icon(left) mdi-file-tree
         .body-2.text-none {{$t('common:sidebar.browse')}}
-      v-btn.ml-3(v-else-if='currentMode === `browse`', depressed, color='blue darken-2', style='flex: 1 1 100%;', @click='switchMode(`custom`)')
+      v-btn.ml-3(v-else-if='currentMode === `browse`', depressed, :color='$vuetify.theme.dark ? `grey darken-4` : `blue darken-2`', style='flex: 1 1 100%;', @click='switchMode(`custom`)')
         v-icon(left) mdi-navigation
         .body-2.text-none {{$t('common:sidebar.mainMenu')}}
     v-divider
@@ -30,6 +30,10 @@
             v-icon(small) mdi-folder-open
           v-list-item-title {{ item.title }}
         v-divider.mt-2
+        v-list-item.mt-2(v-if='currentParent.pageId > 0', :href='`/` + currentParent.path', :key='`directorypage-` + currentParent.id', :input-value='path === currentParent.path')
+          v-list-item-avatar(size='24')
+            v-icon mdi-text-box
+          v-list-item-title {{ currentParent.title }}
         v-subheader.pl-4 {{$t('common:sidebar.currentDirectory')}}
       template(v-for='item of currentItems')
         v-list-item(v-if='item.isFolder', :key='`childfolder-` + item.id', @click='fetchBrowseItems(item)')
@@ -198,6 +202,8 @@ export default {
     this.currentParent.title = `/ ${this.$t('common:sidebar.root')}`
     if (this.navMode === 'TREE') {
       this.currentMode = 'browse'
+    } else if (this.navMode === 'STATIC') {
+      this.currentMode = 'custom'
     } else {
       this.currentMode = window.localStorage.getItem('navPref') || 'custom'
     }

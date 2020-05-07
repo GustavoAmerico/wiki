@@ -56,7 +56,7 @@
       v-divider
       v-container.pl-5.pt-4(fluid, grid-list-xl)
         v-layout(row)
-          v-flex.page-col-sd(lg3, xl2, v-if='$vuetify.breakpoint.lgAndUp', style='margin-top: -90px;')
+          v-flex.page-col-sd(lg3, xl2, v-if='$vuetify.breakpoint.lgAndUp', align-self-start, style='margin-top: -90px; position: sticky; top: 70px;')
             v-card.mb-5(v-if='toc.length')
               .overline.pa-5.pb-0(:class='darkMode ? `blue--text text--lighten-2` : `primary--text`') {{$t('common:page.toc')}}
               v-list.pb-3(dense, nav, :class='darkMode ? `darken-3-d3` : ``')
@@ -249,11 +249,16 @@
 
 <script>
 import { StatusIndicator } from 'vue-status-indicator'
+import Tabset from './tabset.vue'
+import NavSidebar from './nav-sidebar.vue'
 import Prism from 'prismjs'
 import mermaid from 'mermaid'
 import { get } from 'vuex-pathify'
 import _ from 'lodash'
 import ClipboardJS from 'clipboard'
+import Vue from 'vue'
+
+Vue.component('tabset', Tabset)
 
 Prism.plugins.autoloader.languages_path = '/js/prism/'
 Prism.plugins.NormalizeWhitespace.setDefaults({
@@ -292,6 +297,7 @@ Prism.plugins.toolbar.registerButton('copy-to-clipboard', (env) => {
 
 export default {
   components: {
+    NavSidebar,
     StatusIndicator
   },
   props: {
@@ -429,6 +435,10 @@ export default {
     this.$store.set('page/mode', 'view')
   },
   mounted () {
+    if (this.$vuetify.theme.dark) {
+      this.scrollStyle.bar.background = '#424242'
+    }
+
     // -> Check side navigation visibility
     this.handleSideNavVisibility()
     window.addEventListener('resize', _.debounce(() => {
